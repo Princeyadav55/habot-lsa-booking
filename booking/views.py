@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 from .models import BookingRequest, LSAProfile, Payment
+from .payment_service import process_payment
 
 from .serializers import (
     BookingRequestSerializer,
@@ -35,6 +36,7 @@ class LSASearchView(generics.ListAPIView):
 
 
 class PaymentWebhookView(APIView):
+
     def post(self, request):
         booking_id = request.data.get("booking_id")
         payment_status = request.data.get("payment_status")
@@ -54,6 +56,17 @@ class PaymentWebhookView(APIView):
             return Response(
                 {"error": "Invalid payment status."},
                 status=status.HTTP_400_BAD_REQUEST
+            )
+
+        payment_processed = process_payment(
+            booking.id,
+            payment_status
+        )
+
+        if not payment_processed:
+            return Response(
+                {"error": "Payment service is unavailable."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
             )
 
         booking.save()
