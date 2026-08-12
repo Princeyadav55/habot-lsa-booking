@@ -1,60 +1,27 @@
-# HabotConnect LSA Service Booking Backend
+name: Django Tests
 
-**Candidate:** Prince Yadav  
-**Position:** Python Backend Developer  
-**Project:** HabotConnect LSA Service Booking Backend
+on:
+  push:
+  pull_request:
 
-## 1. Project Overview
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-This project is a Django REST Framework backend prototype for HabotConnect.
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-The system connects parents with Learning Support Assistants (LSAs) and provides APIs for:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
-- LSA search by skills
-- LSA availability filtering
-- Service booking
-- Overlapping booking prevention
-- Mock payment processing
-- Payment status updates
-- Automated testing
-- Continuous Integration using GitHub Actions
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-## 2. Technology Stack
-
-- Python 3.13
-- Django 6.1
-- Django REST Framework
-- SQLite
-- Requests
-- GitHub Actions
-
-## 3. Architecture
-
-The project follows Django's MVT architecture with Django REST Framework used for REST API development.
-
-Main application:
-
-```text
-habot-lsa-booking/
-│
-├── booking/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py
-│   ├── urls.py
-│   ├── payment_service.py
-│   └── tests.py
-│
-├── config/
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-│
-├── .github/
-│   └── workflows/
-│       └── tests.yml
-│
-├── manage.py
-├── requirements.txt
-└── README.md
+      - name: Run Django tests
+        run: |
+          python manage.py test
